@@ -36,17 +36,19 @@ class MyGui:
         self.root.mainloop()
 
     def get_entry_text(self):
-        entry_text = self.myentry.get().lower()
+        entry_text = self.myentry.get().lower().title()
         selected_option = self.menu_var.get().lower()
         self.myentry.delete(0, tk.END)
         response = requests.get(f"http://127.0.0.1:5000/{selected_option}/{entry_text}")
         if response.status_code == 200:
             data = response.json()
-            self.update_label(data)
+            print(data)
+            # Create the formatted string
+            formatted_data = '\n'.join([f"'{key}'='{value}'" for key, value in data.items()])
+            print(formatted_data)
+            self.update_label(formatted_data)
 
     def update_label(self, data):
         self.result_label.config(text=data)
     
-        
-
 MyGui()
