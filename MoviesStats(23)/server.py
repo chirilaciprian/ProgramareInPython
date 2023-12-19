@@ -14,11 +14,15 @@ def get_rating_and_reviews_from_rotten_tomatoes(movie_name):
     html = requests.get(f"https://www.rottentomatoes.com/search?search={movie_name}")
     soup = BeautifulSoup(html.text, 'html.parser')
     tmp_link = soup.findAll('search-page-media-row')
+    cast = tmp_link[0].get('cast')
+    year = tmp_link[0].get('releaseyear')
     movie_name = tmp_link[0].findAll('a')[1].text.strip()
     result = tmp_link[0].find('a')
     html = requests.get(result.get('href'))
     soup = BeautifulSoup(html.text, 'html.parser')
+    # print(soup.find('score-board-deprecated').find('h1').text)
     rating = soup.find('score-board-deprecated').get('audiencescore')
+    mdb.insert_into_db(movie_name, rating, year,cast)
     reviews = soup.findAll('review-speech-balloon-deprecated')[:5]
     reviews_dict = {}
     for review in reviews:

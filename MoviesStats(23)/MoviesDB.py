@@ -1,7 +1,6 @@
 from bs4 import BeautifulSoup
 import psycopg2
 import pandas as pd
-import requests
 from sqlalchemy import create_engine,text
 
 class MovieDb:
@@ -17,7 +16,7 @@ class MovieDb:
         self.conn.commit()
 
     def find_rating_by_title(self, title):
-        self.cur.execute('SELECT "Rating" FROM "Movies" WHERE "Title" = %s', (title,))
+        self.cur.execute('SELECT "Rating" FROM "Movies" WHERE LOWER("Title") = %s', (title,))
         result = self.cur.fetchone()
         if result:
             return result[0]
@@ -25,15 +24,14 @@ class MovieDb:
             return None
         
     def find_title_by_actor(self, actor):
-        self.cur.execute('SELECT "Title" FROM "Movies" WHERE "Cast" LIKE %s', ('%' + actor + '%',))
+        self.cur.execute('SELECT "Title" FROM "Movies" WHERE LOWER("Cast") LIKE %s', ('%' + actor + '%',))
         result = self.cur.fetchall()
         if result:
             tmp = '\n'.join([row[0] for row in result[:5]])
             return tmp
         else:
             return "Actor not found"
-    
-
-# Database connection
-
-
+        
+    def insert_into_db(self, title, rating, year,cast):
+        self.cur.execute('INSERT INTO "Movies" ("Title", "Rating", "Year","Cast") VALUES (%s, %s, %s, %s)', (title, rating, year,cast))
+        self.conn.commit()

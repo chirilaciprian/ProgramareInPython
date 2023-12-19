@@ -36,7 +36,7 @@ class MyGui:
         self.root.mainloop()
 
     def get_entry_text(self):
-        entry_text = self.myentry.get().lower().title()
+        entry_text = self.myentry.get().lower()
         selected_option = self.menu_var.get().lower()
         self.myentry.delete(0, tk.END)
         response = requests.get(f"http://127.0.0.1:5000/{selected_option}/{entry_text}")
