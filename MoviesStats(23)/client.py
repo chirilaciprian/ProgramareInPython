@@ -44,6 +44,7 @@ class MyGui:
             data = response.json()
             if selected_option == "movies":
                 formatted_data = '\n'.join([f"{key} : {value}" for key, value in data.items()])
+                print(formatted_data)
             elif selected_option == "actors":
                 movies_data = ''.join(a for a in data)
                 formatted_data = "Known for :\n\n" + movies_data

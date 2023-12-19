@@ -5,7 +5,7 @@ from sqlalchemy import create_engine,text
 
 class MovieDb:
     def __init__(self):
-        self.conn = psycopg2.connect(database="MoviesDB", user="postgres", password="postgres", host="localhost", port="5432")
+        self.conn = psycopg2.connect(database="MoviesDB", user="postgres", password="postgresql", host="localhost", port="5432")
         self.cur = self.conn.cursor()
         self.conn.set_session(autocommit=True)
 
