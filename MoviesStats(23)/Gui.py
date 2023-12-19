@@ -20,7 +20,7 @@ class MyGui:
 
         self.menu_var = tk.StringVar(self.root)
         self.menu_var.set("Movies")
-        self.menu = ttk.Combobox(self.root, textvariable=self.menu_var, values=["Movies", "Actors"])
+        self.menu = ttk.Combobox(self.root, textvariable=self.menu_var, values=["Movies", "Actors", "Reviews"])
         self.menu.config(font=font_style, background=button_color, foreground=fg_color, width=15)
         self.menu.pack(pady=10)
 
@@ -42,13 +42,19 @@ class MyGui:
         response = requests.get(f"http://127.0.0.1:5000/{selected_option}/{entry_text}")
         if response.status_code == 200:
             data = response.json()
-            print(data)
-            # Create the formatted string
-            formatted_data = '\n'.join([f"'{key}'='{value}'" for key, value in data.items()])
-            print(formatted_data)
+            if selected_option == "movies":
+                formatted_data = '\n'.join([f"{key} : {value}" for key, value in data.items()])
+            elif selected_option == "actors":
+                formatted_data = ''.join(a for a in data.values())
+                print(formatted_data)
+            else:
+                name = f"Movie name: {data[1]}\n"
+                quotes_data = '\n'.join([f'{key} : "{value}"' for key, value in data[0].items()])
+                formatted_data = name + quotes_data
+                print(formatted_data)
             self.update_label(formatted_data)
 
     def update_label(self, data):
         self.result_label.config(text=data)
-    
+        
 MyGui()

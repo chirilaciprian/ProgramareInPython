@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup
 import psycopg2
 import pandas as pd
+import requests
 from sqlalchemy import create_engine,text
 
 class MovieDb:
@@ -21,13 +22,18 @@ class MovieDb:
         if result:
             return result[0]
         else:
-            return "Movie not found"
+            return None
+        
+    def find_title_by_actor(self, actor):
+        self.cur.execute('SELECT "Title" FROM "Movies" WHERE "Cast" LIKE %s', ('%' + actor + '%',))
+        result = self.cur.fetchall()
+        if result:
+            tmp = '\n'.join([row[0] for row in result[:5]])
+            return tmp
+        else:
+            return "Actor not found"
+    
 
 # Database connection
-
-
-
-
-
 
 

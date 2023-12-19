@@ -10,31 +10,49 @@ def get_trailer(movie_name):
     trailer = result['result'][0]['link']
     return trailer
 
-def get_rating_from_rotten_tomatoes(movie_name):
-    html = requests.get(f"https://www.rottentomatoes.com/m/{movie_name}")
+def get_rating_and_reviews_from_rotten_tomatoes(movie_name):
+    html = requests.get(f"https://www.rottentomatoes.com/search?search={movie_name}")
     soup = BeautifulSoup(html.text, 'html.parser')
-    result = soup.find(attrs={"data-qa": "audience-score"})
-    return result.text
+    tmp_link = soup.findAll('search-page-media-row')
+    movie_name = tmp_link[0].findAll('a')[1].text.strip()
+    result = tmp_link[0].find('a')
+    html = requests.get(result.get('href'))
+    soup = BeautifulSoup(html.text, 'html.parser')
+    rating = soup.find('score-board-deprecated').get('audiencescore')
+    reviews = soup.findAll('review-speech-balloon-deprecated')[:5]
+    reviews_dict = {}
+    for review in reviews:
+        quote =  review.get('reviewquote')
+        critic_name = review.findAll('a')[1].text.strip()
+        reviews_dict[critic_name] = quote
+    return reviews_dict,rating,movie_name
     
 mdb = MoviesDB.MovieDb()
 app = Flask(__name__)
 
 @app.route("/movies/<movie_name>", methods=["GET"])
 def get_movie(movie_name):
+    rating = mdb.find_rating_by_title(movie_name)
+    if rating is None:
+        _,rating,movie_name = get_rating_and_reviews_from_rotten_tomatoes(movie_name)
     movie_data={
         "trailer": get_trailer(movie_name),
-        "movie_name": movie_name,
-        "rating": mdb.find_rating_by_title(movie_name),
+        "Movie Name": movie_name,
+        "rating": rating,
     }
     return jsonify(movie_data),200
 
 @app.route("/actors/<actor_name>", methods=["GET"])
 def get_actor(actor_name):
     actor_data={
-        "actor_name": actor_name,
-        "rating": "8.5"
+        "Movies": mdb.find_title_by_actor(actor_name),
     }
     return jsonify(actor_data),200
+
+@app.route("/reviews/<movie_name>", methods=["GET"])
+def get_reviews(movie_name):
+    reviews,_,name = get_rating_and_reviews_from_rotten_tomatoes(movie_name)
+    return jsonify(reviews,name),200
 
 if __name__ == '__main__':
     app.run(debug=True)
