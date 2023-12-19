@@ -45,7 +45,8 @@ class MyGui:
             if selected_option == "movies":
                 formatted_data = '\n'.join([f"{key} : {value}" for key, value in data.items()])
             elif selected_option == "actors":
-                formatted_data = ''.join(a for a in data.values())
+                movies_data = ''.join(a for a in data)
+                formatted_data = "Known for :\n\n" + movies_data
                 print(formatted_data)
             else:
                 name = f"Movie name: {data[1]}\n"

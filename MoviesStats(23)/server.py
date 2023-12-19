@@ -48,9 +48,7 @@ def get_movie(movie_name):
 
 @app.route("/actors/<actor_name>", methods=["GET"])
 def get_actor(actor_name):
-    actor_data={
-        "Movies": mdb.find_title_by_actor(actor_name),
-    }
+    actor_data=mdb.find_title_by_actor(actor_name)
     return jsonify(actor_data),200
 
 @app.route("/reviews/<movie_name>", methods=["GET"])
